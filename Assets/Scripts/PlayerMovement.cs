@@ -1,17 +1,51 @@
+using Unity.VisualScripting;
 using UnityEngine;
 
 public class PlayerMovement : MonoBehaviour
 {
-    Rigidbody2D
+    private Rigidbody2D rb2d;
+    
+    //walk left-right
+    private float move; //store Input from player
+    [SerializeField] float speed; 
+    
+    //jump
+    [SerializeField] float jumpForce;
+    [SerializeField] bool isJumping;
     
     void Start()
     {
-        
+       rb2d = GetComponent<Rigidbody2D>();
     }
-
-    // Update is called once per frame
+    
     void Update()
     {
+        //walk
+        move = Input.GetAxis("Horizontal");
+        rb2d.linearVelocity = new Vector2(move * speed, rb2d.linearVelocityY);
         
+        //jump
+        if (Input.GetButtonDown("Jump") && !isJumping)
+        {
+            rb2d.AddForce(new Vector2(rb2d.linearVelocityX, jumpForce));
+            Debug.Log("Jump");
+        }
     }
+
+    private void OnCollisionEnter2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            isJumping = false;
+        }
+    }
+
+    private void OnCollisionExit2D(Collision2D other)
+    {
+        if (other.gameObject.CompareTag("Ground"))
+        {
+            isJumping = true;
+        }
+    }
+    
 }
